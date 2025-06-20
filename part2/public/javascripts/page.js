@@ -247,3 +247,63 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  ）
+  if (document.getElementById("dogTable")) {
+    showDogTable();
+  }
+});
+
+
+async function showDogTable() {
+  const tableDiv = document.getElementById("dogTable");
+  tableDiv.innerHTML = "<p>Loading all dogs...</p>";
+
+  try {
+
+    const res = await fetch("/api/dogs");
+    if (!res.ok) throw new Error("Failed to fetch dogs");
+    const dogs = await res.json();
+
+
+    const imagePromises = dogs.map(() =>
+      fetch("https://dog.ceo/api/breeds/image/random")
+        .then(r => r.json())
+        .then(data => data.message)
+        .catch(() => "https://dog.ceo/img/dog-api-logo.svg")
+    );
+    const dogImages = await Promise.all(imagePromises);
+
+    
+    let html = `
+      <h2 class="mt-5 mb-3 text-success">All Registered Dogs</h2>
+      <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    for (let i = 0; i < dogs.length; i++) {
+      const dog = dogs[i];
+      html += `
+        <tr>
+          <td><img src="${dogImages[i]}" alt="dog photo" style="width:80px;height:80px;object-fit:cover;border-radius:12px"></td>
+          <td>${dog.dog_name}</td>
+          <td>${dog.size}</td>
+          <td>${dog.owner_username}</td>
+        </tr>
+      `;
+    }
+    html += "</tbody></table></div>";
+    tableDiv.innerHTML = html;
+  } catch (err) {
+    tableDiv.innerHTML = "<p class='text-danger'>Failed to load dog list.</p>";
+  }
+}

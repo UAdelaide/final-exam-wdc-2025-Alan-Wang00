@@ -19,8 +19,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false }
 }));
-
-app.use('/api/walks', walkRoutes);
+app.use('/api', walkRoutes); // walkRoutes
 app.use('/api/users', userRoutes);
 
 // Export the app instead of listening here

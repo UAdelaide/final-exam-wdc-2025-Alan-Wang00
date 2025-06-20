@@ -59,4 +59,36 @@ router.post('/:id/apply', async (req, res) => {
   }
 });
 
+// GET walks applied/accepted by a walker
+router.get('/my-applications/:walker_id', async (req, res) => {
+  const walker_id = req.params.walker_id;
+  try {
+
+    const [rows] = await db.query(`
+      SELECT wr.*, d.name AS dog_name, d.size, u.username AS owner_name, wa.status AS application_status
+      FROM WalkApplications wa
+      JOIN WalkRequests wr ON wa.request_id = wr.request_id
+      JOIN Dogs d ON wr.dog_id = d.dog_id
+      JOIN Users u ON d.owner_id = u.user_id
+      WHERE wa.walker_id = ?
+    `, [walker_id]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch applications' });
+  }
+});
+
+router.get('/dogs', async (req, res) => {
+    try {
+        const [dogs] = await db.query(`
+            SELECT Dogs.name AS dog_name, Dogs.size, Users.username AS owner_username
+            FROM Dogs
+            JOIN Users ON Dogs.owner_id = Users.user_id
+        `);
+        res.json(dogs);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get dogs' });
+    }
+});
+
 module.exports = router;
