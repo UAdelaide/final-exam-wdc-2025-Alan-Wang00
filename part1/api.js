@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 
 
 
@@ -61,4 +62,13 @@ router.get('/api/walkers/summary', async (req, res) => {
   }
 });
 
+router.get('/api/dogs/randomimage', async (req, res) => {
+  try {
+    const response = await axios.get('https://dog.ceo/api/breeds/image/random');
+
+    res.json({ image: response.data.message });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch dog image' });
+  }
+});
 module.exports = router;

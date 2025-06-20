@@ -211,3 +211,39 @@ function logout(){
     xmlhttp.send();
 
 }
+
+
+
+
+
+// 13
+document.addEventListener("DOMContentLoaded", function() {
+  const loginForm = document.getElementById("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (data.user) {
+        if (data.user.role === "owner") {
+          window.location.href = "owner-dashboard.html";
+        } else if (data.user.role === "walker") {
+          window.location.href = "walker-dashboard.html";
+        } else {
+          alert("Unknown role: " + data.user.role);
+        }
+      } else {
+        document.getElementById("loginError").textContent = data.error || "Login failed";
+      }
+    });
+  }
+});
